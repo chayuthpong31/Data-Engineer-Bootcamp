@@ -1,3 +1,18 @@
+INSERT INTO users_growth_accounting
+WITH yesterday AS(
+	SELECT * FROM users_growth_accounting
+	WHERE date = DATE('2023-01-06')
+),
+today AS(
+	SELECT
+		CAST(user_id AS TEXT) as user_id,
+		DATE_TRUNC('day', CAST(event_time AS TIMESTAMP)) AS today_date,
+		COUNT(1)
+	FROM events
+	WHERE DATE_TRUNC('day', CAST(event_time AS TIMESTAMP)) = DATE('2023-01-07') AND user_id IS NOT NULL
+	GROUP BY user_id, DATE_TRUNC('day', CAST(event_time AS TIMESTAMP))
+)
+
 SELECT 
 	COALESCE(t.user_id, y.user_id) AS user_id,
 	COALESCE(y.first_active_date, t.today_date) AS first_active_date,
